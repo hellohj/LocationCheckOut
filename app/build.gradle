@@ -20,8 +20,21 @@ android {
     packagingOptions {
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/NOTICE'
+        exclude 'META-INF/services/javax.annotation.processing.Processor'
+    }
+    lintOptions {
+        disable 'InvalidPackage'
     }
 }
+
+def FIREBASE_URL = '"' + firebaseURL + '"' ?: '"Define base url"';
+def FIREBASE_ROOT_NODE = '"' + firebaseRootNode + '"' ?: '"Define root node"';
+
+android.buildTypes.each { type ->
+    type.buildConfigField 'String', 'FIREBASE_URL', FIREBASE_URL
+    type.buildConfigField 'String', 'FIREBASE_ROOT_NODE', FIREBASE_ROOT_NODE
+}
+
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -29,4 +42,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.google.android.gms:play-services:8.4.0'
     compile 'com.firebase:firebase-client-android:2.2.4'
+    compile 'com.jakewharton:butterknife:7.0.1'
 }

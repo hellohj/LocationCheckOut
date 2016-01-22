@@ -40,17 +40,18 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.HashMap;
 import java.util.Map;
 
+import butterknife.Bind;
+
 public class MapsActivity extends FragmentActivity
         implements OnMapReadyCallback, ChildEventListener, LocationListener {
 
+    @Bind(R.id.checkout_button) Button mCheckoutButton;
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
     private LatLngBounds.Builder mBounds = new LatLngBounds.Builder();
     private static final int REQUEST_PLACE_PICKER = 1;
 
     private Firebase mFirebase;
-    private static final String FIREBASE_URL = "";
-    private static final String FIREBASE_ROOT_NODE = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,8 +70,8 @@ public class MapsActivity extends FragmentActivity
         }
         // Set up Firebase
         Firebase.setAndroidContext(this);
-        mFirebase = new Firebase(FIREBASE_URL);
-        mFirebase.child(FIREBASE_ROOT_NODE).addChildEventListener(this);
+        mFirebase = new Firebase(BuildConfig.FIREBASE_URL);
+        mFirebase.child(BuildConfig.FIREBASE_ROOT_NODE).addChildEventListener(this);
     }
 
     protected void onStart() {
@@ -93,7 +94,7 @@ public class MapsActivity extends FragmentActivity
                 // creates a record in Firebase with a key matching the Place ID and with a value
                 Map < String, Object > checkoutData = new HashMap<>();
                 checkoutData.put("time", ServerValue.TIMESTAMP);
-                mFirebase.child(FIREBASE_ROOT_NODE).child(place.getId()).setValue(checkoutData);
+                mFirebase.child(BuildConfig.FIREBASE_ROOT_NODE).child(place.getId()).setValue(checkoutData);
 
             } else if (resultCode == PlacePicker.RESULT_ERROR) {
                 Toast.makeText(this, "Places API failure! Check that the API is enabled for your key",
@@ -112,12 +113,11 @@ public class MapsActivity extends FragmentActivity
         mMap = googleMap;
         // Pad the map controls to make room for the button - note that the button may not have
         // been laid out yet.
-        final Button button = (Button) findViewById(R.id.checkout_button);
-        button.getViewTreeObserver().addOnGlobalLayoutListener(
+        mCheckoutButton.getViewTreeObserver().addOnGlobalLayoutListener(
                 new ViewTreeObserver.OnGlobalLayoutListener() {
                     @Override
                     public void onGlobalLayout() {
-                        mMap.setPadding(0, button.getHeight(), 0, 0);
+                        mMap.setPadding(0, mCheckoutButton.getHeight(), 0, 0);
                     }
                 }
         );
@@ -133,15 +133,6 @@ public class MapsActivity extends FragmentActivity
             return;
         }
         mMap.setMyLocationEnabled(true);
-//        mMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
-//            @Override
-//            public void onMyLocationChange(Location location) {
-//                LatLng ll = new LatLng(location.getLatitude(), location.getLongitude());
-//                addPointToViewPort(ll);
-//                // we only want to grab the location once, to allow the user to pan and zoom freely.
-//                mMap.setOnMyLocationChangeListener(null);
-//            }
-//        });
     }
 
     @Override
