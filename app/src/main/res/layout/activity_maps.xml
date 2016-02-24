@@ -1,19 +1,106 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_height="match_parent"
-    android:layout_width="match_parent">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    xmlns:sothree="http://schemas.android.com/tools">
 
-    <Button android:id="@+id/checkout_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/check_out"
-        android:onClick="checkOut"/>
-
-    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+    <com.sothree.slidinguppanel.SlidingUpPanelLayout
+        android:id="@+id/sliding_layout"
+        android:gravity="bottom"
+        app:shadowHeight="0dp"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+        <!--
+        android:id="@+id/sliding_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/map"
-        tools:context=".MapsActivity"
-        android:name="com.google.android.gms.maps.SupportMapFragment"/>
+        android:gravity="bottom"
+        sothree:umanoDragView="@+id/dragView"
+        sothree:umanoOverlay="true"
+        sothree:umanoPanelHeight="68dp"
+        sothree:umanoParallaxOffset="100dp"
+        sothree:umanoScrollableView="@+id/list"
+        sothree:umanoShadowHeight="4dp">
+        -->
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/checkout_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="checkOut"
+                android:text="@string/check_out" />
+
+            <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/map"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context=".MapsActivity" />
+        </LinearLayout>
+
+        <!-- SLIDING LAYOUT -->
+
+        <RelativeLayout
+            android:id="@+id/slidingContainer"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+            <View
+                android:id="@+id/transparentView"
+                android:visibility="gone"
+                android:layout_width="fill_parent"
+                android:layout_height="@dimen/map_height"
+                android:layout_alignParentTop="true"/>
+
+            <com.hjchoi.locationcheckout.LockableRecyclerView
+                android:id="@android:id/list"
+                android:cacheColorHint="@android:color/white"
+                android:drawSelectorOnTop="true"
+                android:dividerHeight="@dimen/divider_height"
+                android:divider="@android:color/darker_gray"
+                android:background="@android:color/transparent"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_below="@id/transparentView"
+                android:smoothScrollbar="false"/>
+        </RelativeLayout>
+        <!--
+        <LinearLayout
+            android:id="@+id/dragView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#ffffff"
+            android:clickable="true"
+            android:focusable="false"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="fill_parent"
+                android:layout_height="@dimen/map_height"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:textSize="14sp"
+                android:visibility="gone" />
+
+            <ListView
+                android:id="@+id/list"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_below="@id/name"
+                android:visibility="gone"/>
+
+        </LinearLayout>
+        -->
+    </com.sothree.slidinguppanel.SlidingUpPanelLayout>
 
 </FrameLayout>
