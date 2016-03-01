@@ -62,4 +62,5 @@ local.properties
 .cproject
 
 # PDT-specific
+/library
 .buildpath
