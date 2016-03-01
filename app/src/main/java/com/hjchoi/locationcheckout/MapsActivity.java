@@ -12,6 +12,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -65,6 +66,7 @@ public class MapsActivity extends FragmentActivity implements
     // related to SlidingUpPanel
     @Bind(R.id.sliding_layout) SlidingUpPanelLayout mLayout;
     @Bind(R.id.name) TextView mLocationName;
+    @Bind(R.id.map_cover) View mMapCover;
     private GoogleMap mMap;
     private SupportMapFragment mMapFragment;
     private GoogleApiClient mGoogleApiClient;
@@ -80,7 +82,7 @@ public class MapsActivity extends FragmentActivity implements
         setUpGoogleMap();
         setUpFireBase();
         setUpSlidingUpPanel();
-        setUpFabButton();
+        setUpUI();
     }
 
     private void setUpGoogleMap() {
@@ -116,7 +118,17 @@ public class MapsActivity extends FragmentActivity implements
         });
     }
 
-    private void setUpFabButton() {
+    private void setUpUI() {
+        // intercept touch event from SlidingUpPanel
+        mMapCover.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (mLayout.getPanelState() == SlidingUpPanelLayout.PanelState.COLLAPSED) {
+                    mLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+                }
+                return false;
+            }
+        });
         mFabCheckOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -156,16 +168,6 @@ public class MapsActivity extends FragmentActivity implements
         Log.d(LOG_TAG, "onMapReady");
         mMap = googleMap;
         if (mMap != null) {
-            // Pad the map controls to make room for the button - note that the button may not have
-            // been laid out yet.
-//            mCheckoutButton.getViewTreeObserver().addOnGlobalLayoutListener(
-//                    new ViewTreeObserver.OnGlobalLayoutListener() {
-//                        @Override
-//                        public void onGlobalLayout() {
-//                            mMap.setPadding(0, mCheckoutButton.getHeight(), 0, 0);
-//                        }
-//                    }
-//            );
 
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
@@ -194,7 +196,6 @@ public class MapsActivity extends FragmentActivity implements
     private void addPointToViewPort(LatLng newPoint, String placeId) {
         Log.d(LOG_TAG, "addPointToViewPort");
         mBounds.include(newPoint);
-//        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(mBounds.build(), mCheckoutButton.getHeight()));
         BitmapDescriptor defaultMarker =
                 BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
         Log.d(LOG_TAG, "add a market to a map");
@@ -236,15 +237,14 @@ public class MapsActivity extends FragmentActivity implements
                         finish();
                     }
                 }
-
                 @Override
                 public void onCancelled(FirebaseError firebaseError) {
-
                 }
             });
         } else {
             mLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
         }
+        // return true to prevent a map from showing default behaviors like direction, marker title, etc.
         return true;
     }
 
