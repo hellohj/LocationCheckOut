@@ -1,4 +1,4 @@
-package com.hjchoi.locationcheckout;
+package com.hjchoi.locationcheckout.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.android.gms.maps.model.LatLng;
@@ -13,6 +13,7 @@ public class PlaceModel {
     private String address;
     private String website;
     private double rating;
+    private String phone;
     private Map<String, String> timestamp;
 
     public String getPlaceId() {
@@ -62,6 +63,15 @@ public class PlaceModel {
     public void setRating(double rating) {
         this.rating = rating;
     }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
     @JsonIgnore
     public Map<String, String> getTimestamp() {
         return timestamp;

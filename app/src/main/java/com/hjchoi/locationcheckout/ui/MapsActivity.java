@@ -1,4 +1,4 @@
-package com.hjchoi.locationcheckout;
+package com.hjchoi.locationcheckout.ui;
 
 import android.Manifest;
 import android.app.Activity;
@@ -14,6 +14,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,10 +33,11 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBuffer;
+import com.google.android.gms.location.places.PlacePhotoMetadataBuffer;
+import com.google.android.gms.location.places.PlacePhotoMetadataResult;
+import com.google.android.gms.location.places.PlacePhotoResult;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -46,6 +48,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.hjchoi.locationcheckout.BuildConfig;
+import com.hjchoi.locationcheckout.R;
+import com.hjchoi.locationcheckout.model.PlaceModel;
+import com.hjchoi.locationcheckout.utils.Util;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import butterknife.Bind;
@@ -61,12 +67,13 @@ public class MapsActivity extends FragmentActivity implements
 
     private static final String LOG_TAG = MapsActivity.class.getSimpleName();
 
-//    @Bind(R.id.checkout_button) Button mCheckoutButton;
     @Bind(R.id.fab_checkOut) FloatingActionButton mFabCheckOut;
-    // related to SlidingUpPanel
     @Bind(R.id.sliding_layout) SlidingUpPanelLayout mLayout;
-    @Bind(R.id.name) TextView mLocationName;
+    @Bind(R.id.tvName) TextView mLocationName;
     @Bind(R.id.map_cover) View mMapCover;
+    @Bind(R.id.tvPlaceDetails) TextView mPlaceDetails;
+    @Bind(R.id.ivPlacePhoto)
+    ImageView mPlacePhoto;
     private GoogleMap mMap;
     private SupportMapFragment mMapFragment;
     private GoogleApiClient mGoogleApiClient;
@@ -197,7 +204,7 @@ public class MapsActivity extends FragmentActivity implements
         Log.d(LOG_TAG, "addPointToViewPort");
         mBounds.include(newPoint);
         BitmapDescriptor defaultMarker =
-                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
+                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED);
         Log.d(LOG_TAG, "add a market to a map");
         mMap.addMarker(new MarkerOptions()
                 .position(newPoint)
@@ -220,7 +227,6 @@ public class MapsActivity extends FragmentActivity implements
     public boolean onMarkerClick(Marker marker) {
         // Handle marker click here
         Log.d(LOG_TAG, "marker clicked: " + marker.getId() + " -- " + marker.getPosition());
-//                LatLng points = new LatLng(marker.getPosition().latitude, marker.getPosition().longitude);
         if (mLayout != null) {
             mLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
 //            mLocationName.setText(marker.getPosition().toString());
@@ -232,6 +238,13 @@ public class MapsActivity extends FragmentActivity implements
                     if (model != null) {
                         Log.d(LOG_TAG, "market value from firebase child node: " + model.getPlaceId() + "--" + model.getName());
                         mLocationName.setText(model.getName());
+                        ///////////////////
+                        // populate info to panel here????
+                        placePhotosAsync(model.getPlaceId());
+                        // Format the returned place's details and display them in the TextView.
+                        mPlaceDetails.setText(Util.formatPlaceDetails(getResources(), model.getName(), model.getPlaceId(),
+                                model.getAddress(), model.getPhone(), model.getWebsite()));
+                        ///////////////////
                     } else {
                         Log.d(LOG_TAG, "market value from firebase child node: none");
                         finish();
@@ -308,9 +321,13 @@ public class MapsActivity extends FragmentActivity implements
                         placeModel.setWebsite(place.getWebsiteUri().toString());
                     }
                     placeModel.setRating(place.getRating());
+                    if (!TextUtils.isEmpty(place.getPhoneNumber())) {
+                        placeModel.setPhone(place.getPhoneNumber().toString());
+                    }
                     placeModel.setTimestamp(ServerValue.TIMESTAMP);
                     Log.d("place name: ", place.getName().toString());
                     Log.d("place latLng: ", place.getLatLng().toString());
+
                     mFirebase.child(BuildConfig.FIREBASE_ROOT_NODE).child(place.getId()).setValue(placeModel);
                 }
             } else if (resultCode == PlacePicker.RESULT_ERROR) {
@@ -344,8 +361,8 @@ public class MapsActivity extends FragmentActivity implements
                                                Log.d(LOG_TAG, "add a child to firebase and display it to a map with a marker");
                                                LatLng location = places.get(0).getLatLng();
                                                // move camera to a new marker
-                                               CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(location);
-                                               mMap.animateCamera(cameraUpdate);
+//                                               CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(location);
+//                                               mMap.animateCamera(cameraUpdate);
                                                addPointToViewPort(location, places.get(0).getId());
                                                // release places to prevent a memory leak
                                                places.release();
@@ -402,5 +419,46 @@ public class MapsActivity extends FragmentActivity implements
     public void onPanelHidden(View panel) {
         Log.d(LOG_TAG, "onPanelHidden");
         mMap.getUiSettings().setAllGesturesEnabled(true);
+    }
+
+    /////////////////////////
+    // place photo callback
+    /////////////////////////
+    private ResultCallback<PlacePhotoResult> mDisplayPhotoResultCallback
+            = new ResultCallback<PlacePhotoResult>() {
+        @Override
+        public void onResult(PlacePhotoResult placePhotoResult) {
+            if (!placePhotoResult.getStatus().isSuccess()) {
+                return;
+            }
+            mPlacePhoto.setImageBitmap(placePhotoResult.getBitmap());
+        }
+    };
+
+    /**
+     * Load a bitmap from the photos API asynchronously
+     * by using buffers and result callbacks.
+     */
+    private void placePhotosAsync(String placeId) {
+        Places.GeoDataApi.getPlacePhotos(mGoogleApiClient, placeId)
+                .setResultCallback(new ResultCallback<PlacePhotoMetadataResult>() {
+
+                    @Override
+                    public void onResult(PlacePhotoMetadataResult photos) {
+                        if (!photos.getStatus().isSuccess()) {
+                            return;
+                        }
+
+                        PlacePhotoMetadataBuffer photoMetadataBuffer = photos.getPhotoMetadata();
+                        if (photoMetadataBuffer.getCount() > 0) {
+                            // Display the first bitmap in an ImageView in the size of the view
+                            photoMetadataBuffer.get(0)
+                                    .getScaledPhoto(mGoogleApiClient, mPlacePhoto.getWidth(),
+                                            mPlacePhoto.getHeight())
+                                    .setResultCallback(mDisplayPhotoResultCallback);
+                        }
+                        photoMetadataBuffer.release();
+                    }
+                });
     }
 }
