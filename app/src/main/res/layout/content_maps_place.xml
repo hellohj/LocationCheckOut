@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/place_details_container"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <ImageView
+        android:id="@+id/ivPlacePhoto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/ImageStyle"/>
+    <TextView
+        android:id="@+id/tvPlaceName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/NormalTextStyle"/>
+    <TextView
+        android:id="@+id/tvPlaceAddress"
+        android:autoLink="all"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/NormalTextStyle"/>
+    <TextView
+        android:id="@+id/tvPlacePhone"
+        android:autoLink="all"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/NormalTextStyle"/>
+    <TextView
+        android:id="@+id/tvPlaceWebsite"
+        android:autoLink="all"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/NormalTextStyle"/>
+</LinearLayout>

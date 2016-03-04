@@ -63,4 +63,5 @@ local.properties
 
 # PDT-specific
 /library
+*.jar
 .buildpath

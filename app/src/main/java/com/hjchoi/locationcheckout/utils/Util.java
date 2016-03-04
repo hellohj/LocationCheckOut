@@ -17,11 +17,11 @@ public class Util {
     /**
      * Helper method to format information about a place nicely.
      */
-    public static Spanned formatPlaceDetails(Resources res, String name, String id,
+    public static Spanned formatPlaceDetails(Resources res, String name,
                                               String address, String phoneNumber, String websiteUri) {
-        Log.e(LOG_TAG, res.getString(R.string.place_details, name, id, address, phoneNumber,
+        Log.e(LOG_TAG, res.getString(R.string.place_details, name, address, phoneNumber,
                 websiteUri));
-        return Html.fromHtml(res.getString(R.string.place_details, name, id, address, phoneNumber,
+        return Html.fromHtml(res.getString(R.string.place_details, name, address, phoneNumber,
                 websiteUri));
 
     }

@@ -7,13 +7,11 @@
     <![CDATA[
         <b>%1$s</b>
         <br/>
-        <i>Place Id: %2$s</i>
+        %2$s
         <br/>
-        Address: %3$s
+        %3$s
         <br/>
-        Phone: %4$s
-        <br/>
-        Website: %5$s
+        %4$s
     ]]>
     </string>
 </resources>

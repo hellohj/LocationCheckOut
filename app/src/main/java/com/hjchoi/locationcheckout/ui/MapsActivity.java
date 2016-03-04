@@ -38,6 +38,8 @@ import com.google.android.gms.location.places.PlacePhotoMetadataResult;
 import com.google.android.gms.location.places.PlacePhotoResult;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -51,7 +53,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.hjchoi.locationcheckout.BuildConfig;
 import com.hjchoi.locationcheckout.R;
 import com.hjchoi.locationcheckout.model.PlaceModel;
-import com.hjchoi.locationcheckout.utils.Util;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import butterknife.Bind;
@@ -71,9 +72,12 @@ public class MapsActivity extends FragmentActivity implements
     @Bind(R.id.sliding_layout) SlidingUpPanelLayout mLayout;
     @Bind(R.id.tvName) TextView mLocationName;
     @Bind(R.id.map_cover) View mMapCover;
-    @Bind(R.id.tvPlaceDetails) TextView mPlaceDetails;
-    @Bind(R.id.ivPlacePhoto)
-    ImageView mPlacePhoto;
+    @Bind(R.id.ivPlacePhoto) ImageView mPlacePhoto;
+    @Bind(R.id.tvPlaceName) TextView mPlaceName;
+    @Bind(R.id.tvPlaceAddress) TextView mPlaceAddress;
+    @Bind(R.id.tvPlacePhone) TextView mPlacePhone;
+    @Bind(R.id.tvPlaceWebsite) TextView mPlaceWebsite;
+
     private GoogleMap mMap;
     private SupportMapFragment mMapFragment;
     private GoogleApiClient mGoogleApiClient;
@@ -211,10 +215,23 @@ public class MapsActivity extends FragmentActivity implements
                 .title(placeId)
                 .icon(defaultMarker));
         Log.d(LOG_TAG, "map is ready and add marker click listener");
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(newPoint);
+        mMap.animateCamera(cameraUpdate);
         // listen a maker click event
         mMap.setOnMarkerClickListener(this);
         // listen a map move
         mMap.setOnCameraChangeListener(this);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if ((mLayout != null) && (mLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED)) {
+            Log.d(LOG_TAG, "onBackPressed here");
+            mLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+        } else {
+            Log.d(LOG_TAG, "onBackPressed before returning");
+            super.onBackPressed();
+        }
     }
 
     /**
@@ -242,8 +259,24 @@ public class MapsActivity extends FragmentActivity implements
                         // populate info to panel here????
                         placePhotosAsync(model.getPlaceId());
                         // Format the returned place's details and display them in the TextView.
-                        mPlaceDetails.setText(Util.formatPlaceDetails(getResources(), model.getName(), model.getPlaceId(),
-                                model.getAddress(), model.getPhone(), model.getWebsite()));
+//                        mPlaceDetails.setText(Util.formatPlaceDetails(getResources(), model.getName(),
+//                                model.getAddress(), model.getPhone(), model.getWebsite()));
+                        mPlaceName.setText(model.getName());
+                        if (!TextUtils.isEmpty(model.getAddress())) {
+                            mPlaceAddress.setText(model.getAddress());
+                        } else {
+                            mPlaceAddress.setVisibility(View.GONE);
+                        }
+                        if (!TextUtils.isEmpty(model.getPhone())) {
+                            mPlacePhone.setText(model.getPhone());
+                        } else {
+                            mPlacePhone.setVisibility(View.GONE);
+                        }
+                        if (!TextUtils.isEmpty(model.getWebsite())) {
+                            mPlaceWebsite.setText(model.getWebsite());
+                        } else {
+                            mPlaceWebsite.setVisibility(View.GONE);
+                        }
                         ///////////////////
                     } else {
                         Log.d(LOG_TAG, "market value from firebase child node: none");
@@ -446,16 +479,22 @@ public class MapsActivity extends FragmentActivity implements
                     @Override
                     public void onResult(PlacePhotoMetadataResult photos) {
                         if (!photos.getStatus().isSuccess()) {
+                            Log.d(LOG_TAG, "photo get failure");
                             return;
                         }
 
                         PlacePhotoMetadataBuffer photoMetadataBuffer = photos.getPhotoMetadata();
                         if (photoMetadataBuffer.getCount() > 0) {
+                            mPlacePhoto.setVisibility(View.VISIBLE);
+                            Log.d(LOG_TAG, "photo get success - more than one");
                             // Display the first bitmap in an ImageView in the size of the view
                             photoMetadataBuffer.get(0)
                                     .getScaledPhoto(mGoogleApiClient, mPlacePhoto.getWidth(),
                                             mPlacePhoto.getHeight())
                                     .setResultCallback(mDisplayPhotoResultCallback);
+                        } else {
+                            Log.d(LOG_TAG, "photo get success - no photo");
+                            mPlacePhoto.setVisibility(View.GONE);
                         }
                         photoMetadataBuffer.release();
                     }
