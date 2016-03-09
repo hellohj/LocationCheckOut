@@ -1,35 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/place_details_container"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:useDefaultMargins="true"
+    android:alignmentMode="alignBounds"
+    android:columnOrderPreserved="false"
+    android:columnCount="2"
+    android:orientation="horizontal">
+
     <ImageView
         android:id="@+id/ivPlacePhoto"
+        style="@style/ImageTileStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="@style/ImageStyle"/>
-    <TextView
-        android:id="@+id/tvPlaceName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/NormalTextStyle"/>
+        android:layout_columnSpan="2" />
+
+    <ImageView
+        android:id="@+id/ivPlaceAddress"
+        style="@style/ImageIconStyle"
+        android:layout_column="0"
+        android:gravity="center"
+        android:src="@drawable/ic_place_black"
+        android:layout_gravity="center" />
+
     <TextView
         android:id="@+id/tvPlaceAddress"
-        android:autoLink="all"
+        style="@style/NormalTextStyle"
+        android:layout_column="1"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/NormalTextStyle"/>
+        android:layout_gravity="left"
+        android:gravity="center"
+        android:autoLink="all"
+        android:text="address" />
+
+    <ImageView
+        android:id="@+id/ivPlacePhone"
+        style="@style/ImageIconStyle"
+        android:layout_column="0"
+        android:gravity="center"
+        android:src="@drawable/ic_local_phone_black"
+        android:layout_gravity="center" />
+
     <TextView
         android:id="@+id/tvPlacePhone"
+        style="@style/NormalTextStyle"
+        android:layout_column="1"
+        android:layout_gravity="left"
+        android:gravity="center"
         android:autoLink="all"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/NormalTextStyle"/>
+        android:text="phone" />
+
+    <ImageView
+        android:id="@+id/ivPlaceWebsite"
+        style="@style/ImageIconStyle"
+        android:layout_column="0"
+        android:src="@drawable/ic_public_black"
+        android:layout_gravity="center" />
+
     <TextView
         android:id="@+id/tvPlaceWebsite"
+        style="@style/NormalTextStyle"
+        android:layout_column="1"
+        android:layout_gravity="left"
         android:autoLink="all"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/NormalTextStyle"/>
-</LinearLayout>
+        android:text="website"
+        android:gravity="center" />
+
+    <TextView
+        android:layout_columnSpan="2"
+        android:gravity="center"/>
+</GridLayout>

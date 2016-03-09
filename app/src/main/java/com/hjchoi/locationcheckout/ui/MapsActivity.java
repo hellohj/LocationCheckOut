@@ -73,10 +73,12 @@ public class MapsActivity extends FragmentActivity implements
     @Bind(R.id.tvName) TextView mLocationName;
     @Bind(R.id.map_cover) View mMapCover;
     @Bind(R.id.ivPlacePhoto) ImageView mPlacePhoto;
-    @Bind(R.id.tvPlaceName) TextView mPlaceName;
-    @Bind(R.id.tvPlaceAddress) TextView mPlaceAddress;
-    @Bind(R.id.tvPlacePhone) TextView mPlacePhone;
-    @Bind(R.id.tvPlaceWebsite) TextView mPlaceWebsite;
+    @Bind(R.id.ivPlaceAddress) ImageView mIvPlaceAddress;
+    @Bind(R.id.ivPlacePhone) ImageView mIvPlacePhone;
+    @Bind(R.id.ivPlaceWebsite) ImageView mIvPlaceWebsite;
+    @Bind(R.id.tvPlaceAddress) TextView mTvPlaceAddress;
+    @Bind(R.id.tvPlacePhone) TextView mTvPlacePhone;
+    @Bind(R.id.tvPlaceWebsite) TextView mTvPlaceWebsite;
 
     private GoogleMap mMap;
     private SupportMapFragment mMapFragment;
@@ -261,21 +263,26 @@ public class MapsActivity extends FragmentActivity implements
                         // Format the returned place's details and display them in the TextView.
 //                        mPlaceDetails.setText(Util.formatPlaceDetails(getResources(), model.getName(),
 //                                model.getAddress(), model.getPhone(), model.getWebsite()));
-                        mPlaceName.setText(model.getName());
                         if (!TextUtils.isEmpty(model.getAddress())) {
-                            mPlaceAddress.setText(model.getAddress());
+                            mTvPlaceAddress.setText(model.getAddress());
+                            mIvPlaceAddress.setVisibility(View.VISIBLE);
                         } else {
-                            mPlaceAddress.setVisibility(View.GONE);
+                            mTvPlaceAddress.setVisibility(View.GONE);
+                            mIvPlaceAddress.setVisibility(View.GONE);
                         }
                         if (!TextUtils.isEmpty(model.getPhone())) {
-                            mPlacePhone.setText(model.getPhone());
+                            mTvPlacePhone.setText(model.getPhone());
+                            mIvPlacePhone.setVisibility(View.VISIBLE);
                         } else {
-                            mPlacePhone.setVisibility(View.GONE);
+                            mTvPlacePhone.setVisibility(View.GONE);
+                            mIvPlacePhone.setVisibility(View.GONE);
                         }
                         if (!TextUtils.isEmpty(model.getWebsite())) {
-                            mPlaceWebsite.setText(model.getWebsite());
+                            mTvPlaceWebsite.setText(model.getWebsite());
+                            mIvPlaceWebsite.setVisibility(View.VISIBLE);
                         } else {
-                            mPlaceWebsite.setVisibility(View.GONE);
+                            mTvPlaceWebsite.setVisibility(View.GONE);
+                            mIvPlaceWebsite.setVisibility(View.GONE);
                         }
                         ///////////////////
                     } else {
@@ -342,6 +349,10 @@ public class MapsActivity extends FragmentActivity implements
                 Place place = PlacePicker.getPlace(this, data);
                 if (place != null) {
                     PlaceModel placeModel = new PlaceModel();
+
+                    Log.d(LOG_TAG, "******** attributions:" + place.getAttributions());
+                    Log.d(LOG_TAG, "******** reviews:" + place.getRating());
+
                     placeModel.setPlaceId(place.getId());
                     if (!TextUtils.isEmpty(place.getName())) {
                         placeModel.setName(place.getName().toString());
