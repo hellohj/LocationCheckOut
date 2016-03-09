@@ -8,10 +8,10 @@ Your places will be stored in Google Cloud via Firebase so you do not need to wo
 * Display a name of a place on clicking a marker
 
 ###Details View:
-* Show details of a place you checked out via sliding up panel
+* Show details of a place you checked out via a sliding up panel
 
 ### Checkout View:
-* Check out a place through Google Place picker
+* Check out a place through the Google Place picker
 
 # Tool/API use
 * Butter Knife (Binding for Android Views): http://jakewharton.github.io/butterknife/
