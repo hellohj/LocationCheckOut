@@ -1,13 +1,17 @@
 <resources>
 
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar" >
-        <!-- Text styles -->
+        <item name="android:color">@color/colorPrimary</item>
     </style>
-    <style name="ImageStyle">
-        <item name="android:padding">@dimen/image_padding</item>
+    <style name="ImageTileStyle">
+        <item name="android:padding">@dimen/image_tile_padding</item>
+    </style>
+    <style name="ImageIconStyle">
+        <item name="android:padding">@dimen/image_icon_padding</item>
     </style>
     <style name="TextStyle">
         <item name="android:padding">@dimen/text_padding</item>
+        <item name="android:color">@color/colorTextMain</item>
     </style>
     <style name="BigTextStyle" parent="TextStyle">
         <item name="android:textSize">@dimen/text_big</item>
