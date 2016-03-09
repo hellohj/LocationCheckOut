@@ -6,8 +6,10 @@ Your places will be stored in Google Cloud via Firebase so you do not need to wo
 ### Map View:
 * Display places you checked out
 * Display a name of a place on clicking a marker
-### Details View:
+
+###Details View:
 * Show details of a place you checked out via sliding up panel
+
 ### Checkout View:
 * Check out a place through Google Place intent service
 
