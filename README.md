@@ -11,7 +11,7 @@ Your places will be stored in Google Cloud via Firebase so you do not need to wo
 * Show details of a place you checked out via sliding up panel
 
 ### Checkout View:
-* Check out a place through Google Place intent service
+* Check out a place through Google Place picker
 
 # Tool/API use
 * Butter Knife (Binding for Android Views): http://jakewharton.github.io/butterknife/
