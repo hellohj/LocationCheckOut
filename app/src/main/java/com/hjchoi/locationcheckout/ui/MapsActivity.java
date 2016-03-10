@@ -264,21 +264,27 @@ public class MapsActivity extends FragmentActivity implements
 //                        mPlaceDetails.setText(Util.formatPlaceDetails(getResources(), model.getName(),
 //                                model.getAddress(), model.getPhone(), model.getWebsite()));
                         if (!TextUtils.isEmpty(model.getAddress())) {
+                            Log.d(LOG_TAG, "address: " + model.getAddress());
                             mTvPlaceAddress.setText(model.getAddress());
+                            mTvPlaceAddress.setVisibility(View.VISIBLE);
                             mIvPlaceAddress.setVisibility(View.VISIBLE);
                         } else {
                             mTvPlaceAddress.setVisibility(View.GONE);
                             mIvPlaceAddress.setVisibility(View.GONE);
                         }
                         if (!TextUtils.isEmpty(model.getPhone())) {
+                            Log.d(LOG_TAG, "phone: " + model.getPhone());
                             mTvPlacePhone.setText(model.getPhone());
+                            mTvPlacePhone.setVisibility(View.VISIBLE);
                             mIvPlacePhone.setVisibility(View.VISIBLE);
                         } else {
                             mTvPlacePhone.setVisibility(View.GONE);
                             mIvPlacePhone.setVisibility(View.GONE);
                         }
                         if (!TextUtils.isEmpty(model.getWebsite())) {
+                            Log.d(LOG_TAG, "website: " + model.getWebsite());
                             mTvPlaceWebsite.setText(model.getWebsite());
+                            mTvPlaceWebsite.setVisibility(View.VISIBLE);
                             mIvPlaceWebsite.setVisibility(View.VISIBLE);
                         } else {
                             mTvPlaceWebsite.setVisibility(View.GONE);
@@ -349,10 +355,6 @@ public class MapsActivity extends FragmentActivity implements
                 Place place = PlacePicker.getPlace(this, data);
                 if (place != null) {
                     PlaceModel placeModel = new PlaceModel();
-
-                    Log.d(LOG_TAG, "******** attributions:" + place.getAttributions());
-                    Log.d(LOG_TAG, "******** reviews:" + place.getRating());
-
                     placeModel.setPlaceId(place.getId());
                     if (!TextUtils.isEmpty(place.getName())) {
                         placeModel.setName(place.getName().toString());
@@ -369,9 +371,7 @@ public class MapsActivity extends FragmentActivity implements
                         placeModel.setPhone(place.getPhoneNumber().toString());
                     }
                     placeModel.setTimestamp(ServerValue.TIMESTAMP);
-                    Log.d("place name: ", place.getName().toString());
-                    Log.d("place latLng: ", place.getLatLng().toString());
-
+                    // add a place to firebase
                     mFirebase.child(BuildConfig.FIREBASE_ROOT_NODE).child(place.getId()).setValue(placeModel);
                 }
             } else if (resultCode == PlacePicker.RESULT_ERROR) {
@@ -393,8 +393,6 @@ public class MapsActivity extends FragmentActivity implements
     public void onChildAdded(DataSnapshot dataSnapshot, String previousChildKey) {
         Log.d(LOG_TAG, "onChildAdded");
         String placeId = dataSnapshot.getKey();
-//        PlaceModel model = dataSnapshot.getValue(PlaceModel.class);
-//        String placeId = model.getPlaceId();
         Log.d(LOG_TAG, "placeId from dataSnapShot: " + placeId);
         if (placeId != null) {
             Places.GeoDataApi
@@ -403,11 +401,10 @@ public class MapsActivity extends FragmentActivity implements
                                            @Override
                                            public void onResult(PlaceBuffer places) {
                                                Log.d(LOG_TAG, "add a child to firebase and display it to a map with a marker");
-                                               LatLng location = places.get(0).getLatLng();
-                                               // move camera to a new marker
-//                                               CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(location);
-//                                               mMap.animateCamera(cameraUpdate);
-                                               addPointToViewPort(location, places.get(0).getId());
+                                               if (places.get(0) != null) {
+                                                   LatLng location = places.get(0).getLatLng();
+                                                   addPointToViewPort(location, places.get(0).getId());
+                                               }
                                                // release places to prevent a memory leak
                                                places.release();
                                            }
@@ -497,7 +494,7 @@ public class MapsActivity extends FragmentActivity implements
                         PlacePhotoMetadataBuffer photoMetadataBuffer = photos.getPhotoMetadata();
                         if (photoMetadataBuffer.getCount() > 0) {
                             mPlacePhoto.setVisibility(View.VISIBLE);
-                            Log.d(LOG_TAG, "photo get success - more than one");
+                            Log.d(LOG_TAG, "photo get success - more than one: " + photoMetadataBuffer.getCount());
                             // Display the first bitmap in an ImageView in the size of the view
                             photoMetadataBuffer.get(0)
                                     .getScaledPhoto(mGoogleApiClient, mPlacePhoto.getWidth(),
