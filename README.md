@@ -13,9 +13,9 @@ Your places will be stored in Google Cloud via Firebase so you do not need to wo
 ### Checkout View:
 * Check out a place through the Google Place picker
 
-![main map] (https://raw.githubusercontent.com/hellohj/LocationCheckOut/master/images/1.png =90x "Main Map with places you pinned")
-![add a place] (https://raw.githubusercontent.com/hellohj/LocationCheckOut/master/images/2.png =90x "Add a place")
-![details of a place] (https://raw.githubusercontent.com/hellohj/LocationCheckOut/master/images/3.png =90x "Details of a place")
+![Main Map with places you pinned](https://raw.githubusercontent.com/hellohj/LocationCheckOut/master/images/1.png =90x)
+![add a place](https://raw.githubusercontent.com/hellohj/LocationCheckOut/master/images/2.png =90x)
+![details of a place](https://raw.githubusercontent.com/hellohj/LocationCheckOut/master/images/3.png =90x)
 
 # Tool/API use
 * Butter Knife (Binding for Android Views): http://jakewharton.github.io/butterknife/
