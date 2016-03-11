@@ -4,12 +4,14 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -33,6 +35,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBuffer;
+import com.google.android.gms.location.places.PlacePhotoMetadata;
 import com.google.android.gms.location.places.PlacePhotoMetadataBuffer;
 import com.google.android.gms.location.places.PlacePhotoMetadataResult;
 import com.google.android.gms.location.places.PlacePhotoResult;
@@ -52,8 +55,12 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.hjchoi.locationcheckout.BuildConfig;
 import com.hjchoi.locationcheckout.R;
+import com.hjchoi.locationcheckout.core.ImagePagerAdapter;
 import com.hjchoi.locationcheckout.model.PlaceModel;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
+
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -72,13 +79,15 @@ public class MapsActivity extends FragmentActivity implements
     @Bind(R.id.sliding_layout) SlidingUpPanelLayout mLayout;
     @Bind(R.id.tvName) TextView mLocationName;
     @Bind(R.id.map_cover) View mMapCover;
-    @Bind(R.id.ivPlacePhoto) ImageView mPlacePhoto;
+//    @Bind(R.id.ivPlacePhoto) ImageView mPlacePhoto;
     @Bind(R.id.ivPlaceAddress) ImageView mIvPlaceAddress;
     @Bind(R.id.ivPlacePhone) ImageView mIvPlacePhone;
     @Bind(R.id.ivPlaceWebsite) ImageView mIvPlaceWebsite;
     @Bind(R.id.tvPlaceAddress) TextView mTvPlaceAddress;
     @Bind(R.id.tvPlacePhone) TextView mTvPlacePhone;
     @Bind(R.id.tvPlaceWebsite) TextView mTvPlaceWebsite;
+    @Bind(R.id.pager) ViewPager viewPager;
+//    @Bind(R.id.photo) ImageView mPlacePhoto;
 
     private GoogleMap mMap;
     private SupportMapFragment mMapFragment;
@@ -86,6 +95,8 @@ public class MapsActivity extends FragmentActivity implements
     private LatLngBounds.Builder mBounds = new LatLngBounds.Builder();
     private static final int REQUEST_PLACE_PICKER = 1;
     private Firebase mFirebase;
+    private ArrayList<Bitmap> photoList;
+    private ImagePagerAdapter mImagePageAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,6 +143,7 @@ public class MapsActivity extends FragmentActivity implements
     }
 
     private void setUpUI() {
+        photoList = new ArrayList<Bitmap>();
         // intercept touch event from SlidingUpPanel
         mMapCover.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -150,6 +162,11 @@ public class MapsActivity extends FragmentActivity implements
                 checkOut(view);
             }
         });
+        Log.d(LOG_TAG, "setUpUI before image pager");
+        mImagePageAdapter = new ImagePagerAdapter(this, photoList.toArray(new Bitmap[0]));
+        viewPager.setAdapter(mImagePageAdapter);
+        Log.d(LOG_TAG, "setUpUI after image pager");
+
     }
 
     protected void onStart() {
@@ -250,6 +267,7 @@ public class MapsActivity extends FragmentActivity implements
             mLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
 //            mLocationName.setText(marker.getPosition().toString());
             Log.d(LOG_TAG, "market title should be place id: " + marker.getTitle());
+            Log.d(LOG_TAG, "onMarkerClick: what is the size of photos from an adapter: " + viewPager.getAdapter().getCount());
             mFirebase.child(BuildConfig.FIREBASE_ROOT_NODE).child(marker.getTitle()).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -296,6 +314,7 @@ public class MapsActivity extends FragmentActivity implements
                         finish();
                     }
                 }
+
                 @Override
                 public void onCancelled(FirebaseError firebaseError) {
                 }
@@ -443,6 +462,15 @@ public class MapsActivity extends FragmentActivity implements
     public void onPanelExpanded(View panel) {
         Log.d(LOG_TAG, "onPanelExpanded");
         mMap.getUiSettings().setAllGesturesEnabled(false);
+
+        Log.d(LOG_TAG, "setUpUI before image pager");
+        mImagePageAdapter = new ImagePagerAdapter(this, photoList.toArray(new Bitmap[0]));
+        viewPager.setAdapter(mImagePageAdapter);
+        Log.d(LOG_TAG, "setUpUI after image pager");
+//
+//        viewPager.getAdapter().notifyDataSetChanged();
+        Log.d(LOG_TAG, "expanded - count of adapter: " + viewPager.getAdapter().getCount());
+        viewPager.getAdapter().getCount();
     }
 
     @Override
@@ -472,7 +500,10 @@ public class MapsActivity extends FragmentActivity implements
             if (!placePhotoResult.getStatus().isSuccess()) {
                 return;
             }
-            mPlacePhoto.setImageBitmap(placePhotoResult.getBitmap());
+            Log.d(LOG_TAG, "adding photos to array list");
+            photoList.add(placePhotoResult.getBitmap());
+            Log.d(LOG_TAG, "after adding photos: size of the list: " + photoList.size());
+//            mPlacePhoto.setImageBitmap(placePhotoResult.getBitmap());
         }
     };
 
@@ -493,16 +524,27 @@ public class MapsActivity extends FragmentActivity implements
 
                         PlacePhotoMetadataBuffer photoMetadataBuffer = photos.getPhotoMetadata();
                         if (photoMetadataBuffer.getCount() > 0) {
-                            mPlacePhoto.setVisibility(View.VISIBLE);
+//                            mPlacePhoto.setVisibility(View.VISIBLE);
                             Log.d(LOG_TAG, "photo get success - more than one: " + photoMetadataBuffer.getCount());
+
+                            photoList = new ArrayList<Bitmap>();
+                            Iterator<PlacePhotoMetadata> itr = photoMetadataBuffer.iterator();
+                            int count = 0;
+                            while (itr.hasNext() && (count < 3)) {
+                                itr.next().getPhoto(mGoogleApiClient).setResultCallback(mDisplayPhotoResultCallback);
+                                count++;
+                            }
+                            Log.d(LOG_TAG, "assume photo loading async is done: size of photos: " + photoList.size());
+
                             // Display the first bitmap in an ImageView in the size of the view
-                            photoMetadataBuffer.get(0)
-                                    .getScaledPhoto(mGoogleApiClient, mPlacePhoto.getWidth(),
-                                            mPlacePhoto.getHeight())
-                                    .setResultCallback(mDisplayPhotoResultCallback);
+//                            photoMetadataBuffer.get(0)
+//                                    .getScaledPhoto(mGoogleApiClient, mPlacePhoto.getWidth(),
+//                                            mPlacePhoto.getHeight())
+//                                    .setResultCallback(mDisplayPhotoResultCallback);
+
                         } else {
                             Log.d(LOG_TAG, "photo get success - no photo");
-                            mPlacePhoto.setVisibility(View.GONE);
+//                            mPlacePhoto.setVisibility(View.GONE);
                         }
                         photoMetadataBuffer.release();
                     }
