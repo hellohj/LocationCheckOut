@@ -1,4 +1,4 @@
-package com.hjchoi.locationcheckout.ui;
+package com.hjchoi.locationcheckout.ui.fragment;
 
 import android.Manifest;
 import android.app.Activity;
@@ -9,11 +9,12 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -53,12 +54,18 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.hjchoi.locationcheckout.BuildConfig;
 import com.hjchoi.locationcheckout.R;
 import com.hjchoi.locationcheckout.model.PlaceModel;
+import com.hjchoi.locationcheckout.ui.presenter.MapsPresenter;
+import com.hjchoi.locationcheckout.ui.view.MapsView;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
+
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
-public class MapsActivity extends FragmentActivity implements
+public class MapsFragment extends BaseFragment implements
+        MapsView,
         OnMapReadyCallback,
         ChildEventListener,
         LocationListener,
@@ -66,13 +73,18 @@ public class MapsActivity extends FragmentActivity implements
         GoogleMap.OnCameraChangeListener,
         SlidingUpPanelLayout.PanelSlideListener {
 
-    private static final String LOG_TAG = MapsActivity.class.getSimpleName();
+    private static final String LOG_TAG = MapsFragment.class.getSimpleName();
 
-    @Bind(R.id.fab_checkOut) FloatingActionButton mFabCheckOut;
-    @Bind(R.id.sliding_layout) SlidingUpPanelLayout mLayout;
-    @Bind(R.id.tvName) TextView mLocationName;
-    @Bind(R.id.map_cover) View mMapCover;
-    @Bind(R.id.ivPlacePhoto) ImageView mPlacePhoto;
+    @Bind(R.id.fab_checkOut)
+    FloatingActionButton mFabCheckOut;
+    @Bind(R.id.sliding_layout)
+    SlidingUpPanelLayout mLayout;
+    @Bind(R.id.tvName)
+    TextView mLocationName;
+    @Bind(R.id.map_cover)
+    View mMapCover;
+    @Bind(R.id.ivPlacePhoto)
+    ImageView mPlacePhoto;
     @Bind(R.id.ivPlaceAddress) ImageView mIvPlaceAddress;
     @Bind(R.id.ivPlacePhone) ImageView mIvPlacePhone;
     @Bind(R.id.ivPlaceWebsite) ImageView mIvPlaceWebsite;
@@ -87,11 +99,31 @@ public class MapsActivity extends FragmentActivity implements
     private static final int REQUEST_PLACE_PICKER = 1;
     private Firebase mFirebase;
 
+    private MapsPresenter mPresenter;
+
+    public MapsFragment() {
+    }
+
+    public static MapsFragment newInstance() {
+        MapsFragment f = new MapsFragment();
+//        Bundle args = new Bundle();
+//        f.setArguments(args);
+        return f;
+    }
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
-        ButterKnife.bind(this);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_maps, container, false);
+        ButterKnife.bind(this, view);
+        return view;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+//        mPresenter = new MapsPresenterImpl(this);
+//        mPresenter.onActivityCreated();
         setUpGoogleMap();
         setUpFireBase();
         setUpSlidingUpPanel();
@@ -101,20 +133,21 @@ public class MapsActivity extends FragmentActivity implements
     private void setUpGoogleMap() {
         Log.d(LOG_TAG, "setUpGoogleMap");
         // Set up Google Maps
-        mMapFragment = (SupportMapFragment)
-                getSupportFragmentManager().findFragmentById(R.id.map);
-        mMapFragment.getMapAsync(this);
-        if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    .addApi(Places.GEO_DATA_API)
-                    .addApi(AppIndex.API).build();
+        if (mMap == null) {
+            mMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+            mMapFragment.getMapAsync(this);
+            if (mGoogleApiClient == null) {
+                mGoogleApiClient = new GoogleApiClient.Builder(getContext())
+                        .addApi(Places.GEO_DATA_API)
+                        .addApi(AppIndex.API).build();
+            }
         }
     }
 
     private void setUpFireBase() {
         Log.d(LOG_TAG, "setUpFireBase");
         // Set up Firebase
-        Firebase.setAndroidContext(this);
+        Firebase.setAndroidContext(getContext());
         mFirebase = new Firebase(BuildConfig.FIREBASE_URL);
         // childEventListend can handle more sophisticated events handling than addValueListenr
         mFirebase.child(BuildConfig.FIREBASE_ROOT_NODE).addChildEventListener(this);
@@ -152,20 +185,36 @@ public class MapsActivity extends FragmentActivity implements
         });
     }
 
-    protected void onStart() {
+    @Override
+    protected int getFragmentLayout() {
+        return R.layout.fragment_maps;
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        if ((mLayout != null) && (mLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED)) {
+            Log.d(LOG_TAG, "onBackPressed here");
+            mLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+            return false;
+        }
+        Log.d(LOG_TAG, "onBackPressed before returning");
+        return true;
+    }
+
+    public void onStart() {
         Log.d(LOG_TAG, "onStart");
         super.onStart();
         mGoogleApiClient.connect();
     }
 
-    protected void onStop() {
+    public void onStop() {
         Log.d(LOG_TAG, "onStop");
         mGoogleApiClient.disconnect();
         super.onStop();
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         Log.d(LOG_TAG, "onDestroy");
         super.onDestroy();
         ButterKnife.unbind(this);
@@ -182,7 +231,7 @@ public class MapsActivity extends FragmentActivity implements
         mMap = googleMap;
         if (mMap != null) {
 
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
                 //    ActivityCompat#requestPermissions
                 // here to request the missing permissions, and then overriding
@@ -225,16 +274,6 @@ public class MapsActivity extends FragmentActivity implements
         mMap.setOnCameraChangeListener(this);
     }
 
-    @Override
-    public void onBackPressed() {
-        if ((mLayout != null) && (mLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED)) {
-            Log.d(LOG_TAG, "onBackPressed here");
-            mLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-        } else {
-            Log.d(LOG_TAG, "onBackPressed before returning");
-            super.onBackPressed();
-        }
-    }
 
     /**
      * Marker click event from a map
@@ -292,7 +331,7 @@ public class MapsActivity extends FragmentActivity implements
                         ///////////////////
                     } else {
                         Log.d(LOG_TAG, "market value from firebase child node: none");
-                        finish();
+//                        finish();
                     }
                 }
 
@@ -326,17 +365,18 @@ public class MapsActivity extends FragmentActivity implements
      *
      * @param view
      */
+    @OnClick (R.id.fab_checkOut)
     public void checkOut(View view) {
         try {
             Log.d(LOG_TAG, "checkout button clicked");
             PlacePicker.IntentBuilder intentBuilder = new PlacePicker.IntentBuilder();
-            Intent intent = intentBuilder.build(this);
+            Intent intent = intentBuilder.build(getActivity());
             startActivityForResult(intent, REQUEST_PLACE_PICKER);
         } catch (GooglePlayServicesRepairableException e) {
-            GoogleApiAvailability.getInstance().getErrorDialog(this, e.getConnectionStatusCode(),
+            GoogleApiAvailability.getInstance().getErrorDialog(getActivity(), e.getConnectionStatusCode(),
                     REQUEST_PLACE_PICKER);
         } catch (GooglePlayServicesNotAvailableException e) {
-            Toast.makeText(this, "Please install Google Play Services!", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), "Please install Google Play Services!", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -348,11 +388,11 @@ public class MapsActivity extends FragmentActivity implements
      * @param data
      */
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d(LOG_TAG, "onActivityResult: results from a Place Picker intent");
         if (requestCode == REQUEST_PLACE_PICKER) {
             if (resultCode == Activity.RESULT_OK) {
-                Place place = PlacePicker.getPlace(this, data);
+                Place place = PlacePicker.getPlace(getActivity(), data);
                 if (place != null) {
                     PlaceModel placeModel = new PlaceModel();
                     placeModel.setPlaceId(place.getId());
@@ -375,7 +415,7 @@ public class MapsActivity extends FragmentActivity implements
                     mFirebase.child(BuildConfig.FIREBASE_ROOT_NODE).child(place.getId()).setValue(placeModel);
                 }
             } else if (resultCode == PlacePicker.RESULT_ERROR) {
-                Toast.makeText(this, "Places API failure! Check that the API is enabled for your key",
+                Toast.makeText(getActivity(), "Places API failure! Check that the API is enabled for your key",
                         Toast.LENGTH_LONG).show();
             }
         } else {
@@ -508,5 +548,29 @@ public class MapsActivity extends FragmentActivity implements
                         photoMetadataBuffer.release();
                     }
                 });
+    }
+
+
+    //////////////////////////////
+    // MVP - methods from View Interface --- testing now
+    //////////////////////////////
+    @Override
+    public void showProgress() {
+
+    }
+
+    @Override
+    public void hideProgress() {
+
+    }
+
+    @Override
+    public void setItems(List<String> items) {
+
+    }
+
+    @Override
+    public void showMessage(String message) {
+
     }
 }
