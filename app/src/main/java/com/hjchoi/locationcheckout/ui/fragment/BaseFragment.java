@@ -20,6 +20,12 @@ public abstract class BaseFragment extends Fragment{
         initViews(view);
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        destroyView();
+    }
+
     /**
      * Every fragment has to inflate a layout in the onCreateView method. We have added this method to
      * avoid duplicate all the inflate code in every fragment. You only have to return the layout to
@@ -32,5 +38,9 @@ public abstract class BaseFragment extends Fragment{
     }
 
     public abstract boolean onBackPressed();
+
+    private void destroyView() {
+        ButterKnife.unbind(this);
+    }
 
 }

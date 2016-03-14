@@ -1,13 +1,169 @@
 package com.hjchoi.locationcheckout.ui.presenter;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
-public class GoogleMapsInteractorImpl implements GoogleMapsInteractor {
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.places.PlaceBuffer;
+import com.google.android.gms.location.places.Places;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+public class GoogleMapsInteractorImpl implements
+        GoogleMapsInteractor,
+        OnMapReadyCallback,
+        LocationListener {
 
     private static final String LOG_TAG = GoogleMapsInteractorImpl.class.getSimpleName();
 
+    private Context context;
+    private GoogleMap mMap;
+    private GoogleApiClient mGoogleApiClient;
+    private LatLngBounds.Builder mBounds = new LatLngBounds.Builder();
+
     @Override
-    public void setUpGoogleMap() {
+    public void setUpGoogleMap(Context context, SupportMapFragment mapFragment) {
         Log.d(LOG_TAG, "setUpGoogleMap");
+        this.context = context;
+        // Set up Google Maps
+        if (mMap == null) {
+            mapFragment.getMapAsync(this);
+            Log.d(LOG_TAG, "setUpGoogleMap - fragment getMapAsync");
+            if (mGoogleApiClient == null) {
+                mGoogleApiClient = new GoogleApiClient.Builder(context)
+                        .addApi(Places.GEO_DATA_API)
+                        .addApi(AppIndex.API).build();
+            }
+        }
     }
+
+    /**
+     * Map setup. This is called when the GoogleMap is available to manipulate.
+     *
+     * @param googleMap
+     */
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        Log.d(LOG_TAG, "onMapReady");
+        mMap = googleMap;
+        if (mMap != null) {
+            Log.d(LOG_TAG, "onMapReady - map is not null");
+
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            mMap.setMyLocationEnabled(true);
+            mMap.getUiSettings().setCompassEnabled(true);
+            mMap.getUiSettings().setZoomControlsEnabled(true);
+            mMap.getUiSettings().setMyLocationButtonEnabled(true);
+
+            Log.d(LOG_TAG, "onMapReady - ready to use after settings");
+        }
+
+    }
+
+    @Override
+    public void addOnMarkerClickListener(GoogleMap.OnMarkerClickListener markerClickListener) {
+        if (mMap != null) {
+            mMap.setOnMarkerClickListener(markerClickListener);
+        } else {
+            Log.d(LOG_TAG, "map is null so can't attach marker click listener");
+        }
+    }
+
+    @Override
+    public void addOnCameraChangeListener(GoogleMap.OnCameraChangeListener cameraChangeListener) {
+        if (mMap != null) {
+            mMap.setOnCameraChangeListener(cameraChangeListener);
+        }else {
+            Log.d(LOG_TAG, "map is null so can't attach camera change listener");
+        }
+    }
+
+    @Override
+    public void setMapGesturesEnabled(boolean enabled) {
+        mMap.getUiSettings().setAllGesturesEnabled(enabled);
+    }
+
+    @Override
+    public void connectGoogleApiClient(boolean connect) {
+        if (connect) {
+            mGoogleApiClient.connect();
+        } else {
+            mGoogleApiClient.disconnect();
+        }
+    }
+
+    @Override
+    public GoogleApiClient getGoogleApiClient() {
+        return this.mGoogleApiClient;
+    }
+
+    @Override
+    public void addPlaceToMap(String placeId) {
+        Places.GeoDataApi
+                .getPlaceById(mGoogleApiClient, placeId)
+                .setResultCallback(new ResultCallback<PlaceBuffer>() {
+                                       @Override
+                                       public void onResult(PlaceBuffer places) {
+                                           Log.d(LOG_TAG, "add a child to firebase and display it to a map with a marker");
+                                           if (places.get(0) != null) {
+                                               LatLng location = places.get(0).getLatLng();
+                                               addPointToViewPort(location, places.get(0).getId());
+                                           }
+                                           // release places to prevent a memory leak
+                                           places.release();
+                                       }
+                                   }
+                );
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        Log.d(LOG_TAG, "onLocationChanged");
+        LatLng ll = new LatLng(location.getLatitude(), location.getLongitude());
+        addPointToViewPort(ll, null);
+    }
+
+    private void addPointToViewPort(LatLng newPoint, String placeId) {
+        Log.d(LOG_TAG, "addPointToViewPort");
+        mBounds.include(newPoint);
+        BitmapDescriptor defaultMarker =
+                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED);
+        Log.d(LOG_TAG, "add a market to a map");
+        mMap.addMarker(new MarkerOptions()
+                .position(newPoint)
+                .title(placeId)
+                .icon(defaultMarker));
+        Log.d(LOG_TAG, "map is ready and add marker click listener");
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(newPoint);
+        mMap.animateCamera(cameraUpdate);
+//        // listen a maker click event
+//        mMap.setOnMarkerClickListener(this);
+//        // listen a map move
+//        mMap.setOnCameraChangeListener(this);
+    }
+
 }
