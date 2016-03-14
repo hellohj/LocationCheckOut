@@ -33,9 +33,21 @@ public interface GoogleMapsInteractor {
      */
     void setMapGesturesEnabled(boolean enabled);
 
+    /**
+     * Connect/disconnect google api client
+     * @param connect
+     */
     void connectGoogleApiClient(boolean connect);
 
+    /**
+     * Get google api client
+     * @return
+     */
     GoogleApiClient getGoogleApiClient();
 
+    /**
+     * Display places to a map from firebase
+     * @param placeId
+     */
     void addPlaceToMap(String placeId);
 }

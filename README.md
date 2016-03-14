@@ -21,6 +21,6 @@ Your places will be stored in Google Cloud via Firebase so you do not need to wo
 * Butter Knife (Binding for Android Views): http://jakewharton.github.io/butterknife/
 * Android Sliding Up Panel: https://github.com/umano/AndroidSlidingUpPanel
 * Firebase (a platform offering real-time data storage, synchronization and so on): https://www.firebase.com/
-* (TODO) Code refactoring with Effective Android UI
+* Code refactoring according to MVP: https://github.com/antoniolg/androidmvp
 * (TODO) UI testing with Espresso
 * (TODO) Marshmallow permission

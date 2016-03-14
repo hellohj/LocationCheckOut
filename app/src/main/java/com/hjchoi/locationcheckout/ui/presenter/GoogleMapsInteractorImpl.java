@@ -36,6 +36,8 @@ public class GoogleMapsInteractorImpl implements
     private GoogleApiClient mGoogleApiClient;
     private LatLngBounds.Builder mBounds = new LatLngBounds.Builder();
 
+    private static final int REQUEST_CODE_LOCATION = 2;
+
     @Override
     public void setUpGoogleMap(Context context, SupportMapFragment mapFragment) {
         Log.d(LOG_TAG, "setUpGoogleMap");
@@ -64,7 +66,7 @@ public class GoogleMapsInteractorImpl implements
         if (mMap != null) {
             Log.d(LOG_TAG, "onMapReady - map is not null");
 
-            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
                 //    ActivityCompat#requestPermissions
                 // here to request the missing permissions, and then overriding
