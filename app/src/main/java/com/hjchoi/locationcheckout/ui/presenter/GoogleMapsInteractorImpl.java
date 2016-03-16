@@ -1,6 +1,7 @@
 package com.hjchoi.locationcheckout.ui.presenter;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -27,16 +28,16 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class GoogleMapsInteractorImpl implements
         GoogleMapsInteractor,
         OnMapReadyCallback,
-        LocationListener {
+        LocationListener,
+        ActivityCompat.OnRequestPermissionsResultCallback {
 
     private static final String LOG_TAG = GoogleMapsInteractorImpl.class.getSimpleName();
+    private static final int REQUEST_CODE_LOCATION = 2;
 
     private Context context;
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
     private LatLngBounds.Builder mBounds = new LatLngBounds.Builder();
-
-    private static final int REQUEST_CODE_LOCATION = 2;
 
     @Override
     public void setUpGoogleMap(Context context, SupportMapFragment mapFragment) {
@@ -66,24 +67,38 @@ public class GoogleMapsInteractorImpl implements
         if (mMap != null) {
             Log.d(LOG_TAG, "onMapReady - map is not null");
 
+            // ActivityCompat#requestPermissions
             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
+                ActivityCompat.requestPermissions((Activity) context,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        REQUEST_CODE_LOCATION);
+//                return;
+            } else {
+                // Location permission has been granted, continue as usual.
+//                Location myLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+                mMap.setMyLocationEnabled(true);
+                mMap.getUiSettings().setCompassEnabled(true);
+                mMap.getUiSettings().setZoomControlsEnabled(true);
+                mMap.getUiSettings().setMyLocationButtonEnabled(true);
             }
-            mMap.setMyLocationEnabled(true);
-            mMap.getUiSettings().setCompassEnabled(true);
-            mMap.getUiSettings().setZoomControlsEnabled(true);
-            mMap.getUiSettings().setMyLocationButtonEnabled(true);
-
             Log.d(LOG_TAG, "onMapReady - ready to use after settings");
         }
+    }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String[] permissions,
+                                           int[] grantResults) {
+        if (requestCode == REQUEST_CODE_LOCATION) {
+            if (grantResults.length == 1
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // success!
+                Log.d(LOG_TAG, "Map permission has now been granted. Showing preview.");
+            } else {
+                // Permission was denied or request was cancelled
+                Log.d(LOG_TAG, "Map permission was not granted.");
+            }
+        }
     }
 
     @Override
@@ -162,10 +177,5 @@ public class GoogleMapsInteractorImpl implements
         Log.d(LOG_TAG, "map is ready and add marker click listener");
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(newPoint);
         mMap.animateCamera(cameraUpdate);
-//        // listen a maker click event
-//        mMap.setOnMarkerClickListener(this);
-//        // listen a map move
-//        mMap.setOnCameraChangeListener(this);
     }
-
 }
