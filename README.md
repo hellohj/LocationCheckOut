@@ -2,6 +2,10 @@
 If you are a person who love to record a lot of things, this app will help you to keep track of places you like. 
 Your places will be stored in Google Cloud via Firebase so you do not need to worry about losing your pins.
 
+[1]: https://play.google.com/store/apps/details?id=com.hjchoi.locationcheckout
+[2]: https://raw.githubusercontent.com/hellohj/LocationCheckOut/master/images/google-play-badge.png
+[![Pin your place app][2]][1]
+
 # User Stories
 ### Map View:
 * Display places you checked out
