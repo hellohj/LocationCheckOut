@@ -11,7 +11,7 @@ import com.hjchoi.locationcheckout.ui.fragment.MapsFragment;
 
 public class MapsActivity extends FragmentActivity {
 
-    private static final String LOG_TAG = MapsActivity.class.getSimpleName();
+    private static final String TAG = "MapsActivity";
 
     private BaseFragment _currentFragment;
 
@@ -32,10 +32,10 @@ public class MapsActivity extends FragmentActivity {
         // intercept back press from details panel
         _currentFragment = (MapsFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_maps);
         if ((_currentFragment != null) && (_currentFragment.onBackPressed())) {
-            Log.d(LOG_TAG, "onBackPressed - from details to main map view");
+            Log.d(TAG, "onBackPressed - from details to main map view");
             super.onBackPressed();
         } else {
-            Log.d(LOG_TAG, "onBackPressed - something else");
+            Log.d(TAG, "onBackPressed - something else");
         }
     }
 }

@@ -12,7 +12,7 @@ import android.widget.TextView;
 import com.firebase.client.ServerValue;
 import com.google.android.gms.location.places.Place;
 import com.hjchoi.locationcheckout.R;
-import com.hjchoi.locationcheckout.model.PlaceModel;
+import com.hjchoi.locationcheckout.model.MyPlace;
 
 public class Utils {
 
@@ -30,25 +30,25 @@ public class Utils {
 
     }
 
-    public static PlaceModel populatePlaceModel(Place place) {
-        PlaceModel placeModel = new PlaceModel();
-        placeModel.setPlaceId(place.getId());
+    public static MyPlace populatePlaceModel(Place place) {
+        MyPlace myPlace = new MyPlace();
+        myPlace.setPlaceId(place.getId());
         if (!TextUtils.isEmpty(place.getName())) {
-            placeModel.setName(place.getName().toString());
+            myPlace.setName(place.getName().toString());
         }
-        placeModel.setLocation(place.getLatLng());
+        myPlace.setLocation(place.getLatLng());
         if (!TextUtils.isEmpty(place.getAddress())) {
-            placeModel.setAddress(place.getAddress().toString());
+            myPlace.setAddress(place.getAddress().toString());
         }
         if ((place.getWebsiteUri() != null) && !TextUtils.isEmpty(place.getWebsiteUri().toString())) {
-            placeModel.setWebsite(place.getWebsiteUri().toString());
+            myPlace.setWebsite(place.getWebsiteUri().toString());
         }
-        placeModel.setRating(place.getRating());
+        myPlace.setRating(place.getRating());
         if (!TextUtils.isEmpty(place.getPhoneNumber())) {
-            placeModel.setPhone(place.getPhoneNumber().toString());
+            myPlace.setPhone(place.getPhoneNumber().toString());
         }
-        placeModel.setTimestamp(ServerValue.TIMESTAMP);
-        return placeModel;
+        myPlace.setTimestamp(ServerValue.TIMESTAMP);
+        return myPlace;
     }
 
     public static void setDetailsOfPlace(String text, TextView tv, ImageView iv) {

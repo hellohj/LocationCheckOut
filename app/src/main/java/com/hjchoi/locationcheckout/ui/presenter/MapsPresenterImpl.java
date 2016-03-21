@@ -3,6 +3,7 @@ package com.hjchoi.locationcheckout.ui.presenter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -18,7 +19,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Marker;
-import com.hjchoi.locationcheckout.model.PlaceModel;
+import com.hjchoi.locationcheckout.model.MyPlace;
 import com.hjchoi.locationcheckout.ui.view.MapsView;
 import com.hjchoi.locationcheckout.utils.Utils;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
@@ -32,7 +33,7 @@ public class MapsPresenterImpl implements
         SlidingUpPanelLayout.PanelSlideListener,
         View.OnClickListener {
 
-    private static final String LOG_TAG = MapsPresenterImpl.class.getSimpleName();
+    private static final String TAG = "MapsPresenterImpl";
 
     private MapsView mView;
     private GoogleMapsInteractor mGoogleMapsInteractor;
@@ -46,16 +47,17 @@ public class MapsPresenterImpl implements
 
     @Override
     public void onActivityResult(int resultCode, Intent data, Activity activity) {
-        Log.d(LOG_TAG, "onActivityResult: results from a Place Picker intent");
+        Log.d(TAG, "onActivityResult: results from a Place Picker intent");
         if (resultCode == Activity.RESULT_OK) {
             Place place = PlacePicker.getPlace(activity, data);
             if (place != null) {
-                PlaceModel placeModel = Utils.populatePlaceModel(place);
+                MyPlace myPlace = Utils.populatePlaceModel(place);
                 // add a place to firebase
-//                    mFirebase.child(BuildConfig.FIREBASE_ROOT_NODE).child(place.getId()).setValue(placeModel);
-                mFirebaseInteractor.setChildOnActivityResult(place.getId(), placeModel);
+//                    mFirebase.child(BuildConfig.FIREBASE_ROOT_NODE).child(place.getId()).setValue(myPlace);
+                mFirebaseInteractor.setChildOnActivityResult(place.getId(), myPlace);
             }
         } else if (resultCode == PlacePicker.RESULT_ERROR) {
+            //mView.showError("asjasjdhj");
             Toast.makeText(activity, "Places API failure! Check that the API is enabled for your key",
                     Toast.LENGTH_LONG).show();
         }
@@ -72,14 +74,14 @@ public class MapsPresenterImpl implements
     }
 
     @Override
-    public void setFirebase(Context context) {
+    public void setFirebase(@NonNull Context context) {
         mFirebaseInteractor.setUpFirebase(context);
         mFirebaseInteractor.addFirebasChildEventListener(this);
     }
 
     @Override
     public void setSlidingUpPanel(Context context) {
-        Log.d(LOG_TAG, "setUpSlidingUpPanel");
+        Log.d(TAG, "setUpSlidingUpPanel");
         mView.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
         mView.setAddPanelSlideListener(this);
         mView.setFadeOnClickListener(this);
@@ -107,7 +109,7 @@ public class MapsPresenterImpl implements
      */
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
-        Log.d(LOG_TAG, "map onCameraChange: let's set panel state hidden");
+        Log.d(TAG, "map onCameraChange: let's set panel state hidden");
         // when a user moves on, disable sliding panel so that a user can click a marker
         mView.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
     }
@@ -121,7 +123,7 @@ public class MapsPresenterImpl implements
     @Override
     public boolean onMarkerClick(Marker marker) {
         // Handle marker click here
-        Log.d(LOG_TAG, "marker clicked: " + marker.getId() + " -- " + marker.getPosition());
+        Log.d(TAG, "marker clicked: " + marker.getId() + " -- " + marker.getPosition());
         if (mView.existSlidingUpPanelLayout() ){
             mView.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
             mFirebaseInteractor.addFirebaseValueEventListener(this, marker.getTitle());
@@ -143,9 +145,8 @@ public class MapsPresenterImpl implements
     //////////////////////////////////////////////////
     @Override
     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-        Log.d(LOG_TAG, "onChildAdded");
         String placeId = dataSnapshot.getKey();
-        Log.d(LOG_TAG, "placeId from dataSnapShot: " + placeId);
+        Log.d(TAG, "onChildAdded: placeId from dataSnapShot: " + placeId);
         if (placeId != null) {
             ///////////////////////////////////
             // should i add listeners to each market? or is this ok?
@@ -174,22 +175,22 @@ public class MapsPresenterImpl implements
 
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
-        PlaceModel model = dataSnapshot.getValue(PlaceModel.class);
+        MyPlace model = dataSnapshot.getValue(MyPlace.class);
         if (model != null) {
-            Log.d(LOG_TAG, "market value from firebase child node: " + model.getPlaceId() + "--" + model.getName());
+            Log.d(TAG, "market value from firebase child node: " + model.getPlaceId() + "--" + model.getName());
             // populate info to panel here
             mView.showDetailsOfPlace(model);
             mView.showPhotoOfPlace(model.getPlaceId());
             placePhotosAsync(model.getPlaceId());
         } else {
-            Log.d(LOG_TAG, "market value from firebase child node: none");
+            Log.d(TAG, "market value from firebase child node: none");
 //                        finish();
         }
     }
 
     @Override
     public void onCancelled(FirebaseError firebaseError) {
-        Log.d(LOG_TAG, "Firebase onCancelled: FirebaseError: " + firebaseError.getMessage());
+        Log.d(TAG, "Firebase onCancelled: FirebaseError: " + firebaseError.getMessage());
     }
 
     //////////////////////////////////////////////////
@@ -197,30 +198,30 @@ public class MapsPresenterImpl implements
     //////////////////////////////////////////////////
     @Override
     public void onPanelSlide(View panel, float slideOffset) {
-        Log.d(LOG_TAG, "onPanelSlide, offset " + slideOffset);
+        Log.d(TAG, "onPanelSlide, offset " + slideOffset);
         mGoogleMapsInteractor.setMapGesturesEnabled(true);
     }
 
     @Override
     public void onPanelExpanded(View panel) {
-        Log.d(LOG_TAG, "onPanelExpanded");
+        Log.d(TAG, "onPanelExpanded");
         mGoogleMapsInteractor.setMapGesturesEnabled(false);
     }
 
     @Override
     public void onPanelCollapsed(View panel) {
-        Log.d(LOG_TAG, "onPanelCollapsed");
+        Log.d(TAG, "onPanelCollapsed");
         mGoogleMapsInteractor.setMapGesturesEnabled(true);
     }
 
     @Override
     public void onPanelAnchored(View panel) {
-        Log.d(LOG_TAG, "onPanelAnchored");
+        Log.d(TAG, "onPanelAnchored");
     }
 
     @Override
     public void onPanelHidden(View panel) {
-        Log.d(LOG_TAG, "onPanelHidden");
+        Log.d(TAG, "onPanelHidden");
         mGoogleMapsInteractor.setMapGesturesEnabled(true);
     }
 

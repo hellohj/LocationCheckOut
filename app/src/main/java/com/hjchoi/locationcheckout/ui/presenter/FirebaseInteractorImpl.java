@@ -7,18 +7,18 @@ import com.firebase.client.ChildEventListener;
 import com.firebase.client.Firebase;
 import com.firebase.client.ValueEventListener;
 import com.hjchoi.locationcheckout.BuildConfig;
-import com.hjchoi.locationcheckout.model.PlaceModel;
+import com.hjchoi.locationcheckout.model.MyPlace;
 
 public class FirebaseInteractorImpl implements
         FirebaseInteractor {
 
-    private static final String LOG_TAG = FirebaseInteractorImpl.class.getSimpleName();
+    private static final String TAG = "FirebaseInteractorImpl";
 
     private Firebase mFirebase;
 
     @Override
     public void setUpFirebase(Context context) {
-        Log.d(LOG_TAG, "setUpFirebase");
+        Log.d(TAG, "setUpFirebase");
         // Set up Firebase
         Firebase.setAndroidContext(context);
         mFirebase = new Firebase(BuildConfig.FIREBASE_URL);
@@ -36,8 +36,8 @@ public class FirebaseInteractorImpl implements
     }
 
     @Override
-    public void setChildOnActivityResult(String placeId, PlaceModel placeModel) {
-        mFirebase.child(BuildConfig.FIREBASE_ROOT_NODE).child(placeId).setValue(placeModel);
+    public void setChildOnActivityResult(String placeId, MyPlace myPlace) {
+        mFirebase.child(BuildConfig.FIREBASE_ROOT_NODE).child(placeId).setValue(myPlace);
     }
 
 }

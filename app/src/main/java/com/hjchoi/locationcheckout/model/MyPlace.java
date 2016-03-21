@@ -5,7 +5,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.Map;
 
-public class PlaceModel {
+public class MyPlace {
 
     private String placeId;
     private String name;

@@ -34,6 +34,6 @@
         android:layout_gravity="top|right"
         android:layout_margin="@dimen/fab_margin"
         android:clickable="true"
-        android:src="@drawable/ic_pin_drop_black" />
+        android:src="@drawable/ic_pin_drop_24dp" />
 
 </android.support.design.widget.CoordinatorLayout>

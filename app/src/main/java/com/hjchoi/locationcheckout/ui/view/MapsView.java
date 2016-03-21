@@ -3,7 +3,7 @@ package com.hjchoi.locationcheckout.ui.view;
 import android.graphics.Bitmap;
 import android.view.View;
 
-import com.hjchoi.locationcheckout.model.PlaceModel;
+import com.hjchoi.locationcheckout.model.MyPlace;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 public interface MapsView {
@@ -55,6 +55,6 @@ public interface MapsView {
      * Display details of a place
      * @param model
      */
-    void showDetailsOfPlace(PlaceModel model);
+    void showDetailsOfPlace(MyPlace model);
 
 }

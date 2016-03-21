@@ -23,7 +23,7 @@ import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.hjchoi.locationcheckout.R;
-import com.hjchoi.locationcheckout.model.PlaceModel;
+import com.hjchoi.locationcheckout.model.MyPlace;
 import com.hjchoi.locationcheckout.ui.presenter.MapsPresenter;
 import com.hjchoi.locationcheckout.ui.presenter.MapsPresenterImpl;
 import com.hjchoi.locationcheckout.ui.view.MapsView;
@@ -36,7 +36,7 @@ import butterknife.OnClick;
 public class MapsFragment extends BaseFragment implements
         MapsView {
 
-    private static final String LOG_TAG = MapsFragment.class.getSimpleName();
+    private static final String TAG = "MapsFragment";
 
     @Bind(R.id.fab_checkOut)
     FloatingActionButton mFabCheckOut;
@@ -86,23 +86,25 @@ public class MapsFragment extends BaseFragment implements
     @Override
     public boolean onBackPressed() {
         if ((mLayout != null) && (mLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED)) {
-            Log.d(LOG_TAG, "onBackPressed here");
+            Log.d(TAG, "onBackPressed here");
             mLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
             return false;
         }
-        Log.d(LOG_TAG, "onBackPressed before returning");
+        Log.d(TAG, "onBackPressed before returning");
         return true;
     }
 
     public void onStart() {
-        Log.d(LOG_TAG, "onStart");
+        Log.d(TAG, "onStart");
         super.onStart();
         mPresenter.connectGoogleApiClient(true);
+        //mPresenter.onStart();
     }
 
     public void onStop() {
-        Log.d(LOG_TAG, "onStop");
+        Log.d(TAG, "onStop");
         mPresenter.connectGoogleApiClient(false);
+        //mPresenter.onStop();
         super.onStop();
     }
 
@@ -115,7 +117,7 @@ public class MapsFragment extends BaseFragment implements
     @Override
     public void checkOut(View view) {
         try {
-            Log.d(LOG_TAG, "checkout button clicked");
+            Log.d(TAG, "checkout button clicked");
             PlacePicker.IntentBuilder intentBuilder = new PlacePicker.IntentBuilder();
             Intent intent = intentBuilder.build(getActivity());
             startActivityForResult(intent, REQUEST_PLACE_PICKER);
@@ -136,7 +138,7 @@ public class MapsFragment extends BaseFragment implements
      */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d(LOG_TAG, "onActivityResult: results from a Place Picker intent");
+        Log.d(TAG, "onActivityResult: results from a Place Picker intent");
         if (requestCode == REQUEST_PLACE_PICKER) {
             mPresenter.onActivityResult(resultCode, data, getActivity());
         } else {
@@ -206,7 +208,7 @@ public class MapsFragment extends BaseFragment implements
     }
 
     @Override
-    public void showDetailsOfPlace(PlaceModel model) {
+    public void showDetailsOfPlace(MyPlace model) {
         mLocationName.setText(model.getName());
         Utils.setDetailsOfPlace(model.getAddress(), mTvPlaceAddress, mIvPlaceAddress);
         Utils.setDetailsOfPlace(model.getPhone(), mTvPlacePhone, mIvPlacePhone);
@@ -239,13 +241,13 @@ public class MapsFragment extends BaseFragment implements
                     @Override
                     public void onResult(PlacePhotoMetadataResult photos) {
                         if (!photos.getStatus().isSuccess()) {
-                            Log.d(LOG_TAG, "photo get failure");
+                            Log.d(TAG, "photo get failure");
                             return;
                         }
                         PlacePhotoMetadataBuffer photoMetadataBuffer = photos.getPhotoMetadata();
                         if (photoMetadataBuffer.getCount() > 0) {
                             mPlacePhoto.setVisibility(View.VISIBLE);
-                            Log.d(LOG_TAG, "photo get success - more than one: " + photoMetadataBuffer.getCount());
+                            Log.d(TAG, "photo get success - more than one: " + photoMetadataBuffer.getCount());
                             // Display the first bitmap in an ImageView in the size of the view
                             photoMetadataBuffer.get(0)
                                     .getScaledPhoto(mPresenter.getGoogleApiClient(), mPlacePhoto.getWidth(),
@@ -253,7 +255,7 @@ public class MapsFragment extends BaseFragment implements
                                     .setResultCallback(mDisplayPhotoResultCallback);
 
                         } else {
-                            Log.d(LOG_TAG, "photo get success - no photo");
+                            Log.d(TAG, "photo get success - no photo");
                             mPlacePhoto.setVisibility(View.GONE);
                         }
                         photoMetadataBuffer.release();

@@ -31,7 +31,7 @@ public class GoogleMapsInteractorImpl implements
         LocationListener,
         ActivityCompat.OnRequestPermissionsResultCallback {
 
-    private static final String LOG_TAG = GoogleMapsInteractorImpl.class.getSimpleName();
+    private static final String TAG = "GoogleMapsInteractorImpl";
     private static final int REQUEST_CODE_LOCATION = 2;
 
     private Context context;
@@ -41,12 +41,12 @@ public class GoogleMapsInteractorImpl implements
 
     @Override
     public void setUpGoogleMap(Context context, SupportMapFragment mapFragment) {
-        Log.d(LOG_TAG, "setUpGoogleMap");
+        Log.d(TAG, "setUpGoogleMap");
         this.context = context;
         // Set up Google Maps
         if (mMap == null) {
             mapFragment.getMapAsync(this);
-            Log.d(LOG_TAG, "setUpGoogleMap - fragment getMapAsync");
+            Log.d(TAG, "setUpGoogleMap - fragment getMapAsync");
             if (mGoogleApiClient == null) {
                 mGoogleApiClient = new GoogleApiClient.Builder(context)
                         .addApi(Places.GEO_DATA_API)
@@ -62,10 +62,10 @@ public class GoogleMapsInteractorImpl implements
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        Log.d(LOG_TAG, "onMapReady");
+        Log.d(TAG, "onMapReady");
         mMap = googleMap;
         if (mMap != null) {
-            Log.d(LOG_TAG, "onMapReady - map is not null");
+            Log.d(TAG, "onMapReady - map is not null");
 
             // ActivityCompat#requestPermissions
             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -81,7 +81,7 @@ public class GoogleMapsInteractorImpl implements
                 mMap.getUiSettings().setZoomControlsEnabled(true);
                 mMap.getUiSettings().setMyLocationButtonEnabled(true);
             }
-            Log.d(LOG_TAG, "onMapReady - ready to use after settings");
+            Log.d(TAG, "onMapReady - ready to use after settings");
         }
     }
 
@@ -93,10 +93,10 @@ public class GoogleMapsInteractorImpl implements
             if (grantResults.length == 1
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // success!
-                Log.d(LOG_TAG, "Map permission has now been granted. Showing preview.");
+                Log.d(TAG, "Map permission has now been granted. Showing preview.");
             } else {
                 // Permission was denied or request was cancelled
-                Log.d(LOG_TAG, "Map permission was not granted.");
+                Log.d(TAG, "Map permission was not granted.");
             }
         }
     }
@@ -106,7 +106,7 @@ public class GoogleMapsInteractorImpl implements
         if (mMap != null) {
             mMap.setOnMarkerClickListener(markerClickListener);
         } else {
-            Log.d(LOG_TAG, "map is null so can't attach marker click listener");
+            Log.d(TAG, "map is null so can't attach marker click listener");
         }
     }
 
@@ -115,7 +115,7 @@ public class GoogleMapsInteractorImpl implements
         if (mMap != null) {
             mMap.setOnCameraChangeListener(cameraChangeListener);
         }else {
-            Log.d(LOG_TAG, "map is null so can't attach camera change listener");
+            Log.d(TAG, "map is null so can't attach camera change listener");
         }
     }
 
@@ -145,7 +145,7 @@ public class GoogleMapsInteractorImpl implements
                 .setResultCallback(new ResultCallback<PlaceBuffer>() {
                                        @Override
                                        public void onResult(PlaceBuffer places) {
-                                           Log.d(LOG_TAG, "add a child to firebase and display it to a map with a marker");
+                                           Log.d(TAG, "add a child to firebase and display it to a map with a marker");
                                            if (places.get(0) != null) {
                                                LatLng location = places.get(0).getLatLng();
                                                addPointToViewPort(location, places.get(0).getId());
@@ -159,22 +159,22 @@ public class GoogleMapsInteractorImpl implements
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.d(LOG_TAG, "onLocationChanged");
+        Log.d(TAG, "onLocationChanged");
         LatLng ll = new LatLng(location.getLatitude(), location.getLongitude());
         addPointToViewPort(ll, null);
     }
 
     private void addPointToViewPort(LatLng newPoint, String placeId) {
-        Log.d(LOG_TAG, "addPointToViewPort");
+        Log.d(TAG, "addPointToViewPort");
         mBounds.include(newPoint);
         BitmapDescriptor defaultMarker =
                 BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED);
-        Log.d(LOG_TAG, "add a market to a map");
+        Log.d(TAG, "add a market to a map");
         mMap.addMarker(new MarkerOptions()
                 .position(newPoint)
                 .title(placeId)
                 .icon(defaultMarker));
-        Log.d(LOG_TAG, "map is ready and add marker click listener");
+        Log.d(TAG, "map is ready and add marker click listener");
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(newPoint);
         mMap.animateCamera(cameraUpdate);
     }

@@ -2,16 +2,16 @@ package com.hjchoi.locationcheckout.model;
 
 import java.util.HashMap;
 
-public class UserModel {
+public class User {
     private String name;
     private String email;
     private HashMap<String, Object> timestampJoined;
     private boolean hasLoggedInWithPassword;
 
-    public UserModel() {
+    public User() {
     }
 
-    public UserModel(String name, String email, HashMap<String, Object> timestampJoined) {
+    public User(String name, String email, HashMap<String, Object> timestampJoined) {
         this.name = name;
         this.email = email;
         this.timestampJoined = timestampJoined;

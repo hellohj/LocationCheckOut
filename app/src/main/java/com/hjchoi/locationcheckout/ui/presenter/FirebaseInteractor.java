@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.ValueEventListener;
-import com.hjchoi.locationcheckout.model.PlaceModel;
+import com.hjchoi.locationcheckout.model.MyPlace;
 
 public interface FirebaseInteractor {
     /**
@@ -16,9 +16,9 @@ public interface FirebaseInteractor {
     /**
      * Add a new place to firebase
      * @param placeId
-     * @param placeModel
+     * @param myPlace
      */
-    void setChildOnActivityResult(String placeId, PlaceModel placeModel);
+    void setChildOnActivityResult(String placeId, MyPlace myPlace);
 
     /**
      * Add a listener for root note data changes

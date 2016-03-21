@@ -11,13 +11,13 @@
                     "endOffset": 1193
                 },
                 "from": {
-                    "file": "/Users/hjchoi/Documents/dev/LocationCheckOut/library/build/intermediates/exploded-aar/com.android.support/recyclerview-v7/23.1.1/res/values/values.xml",
+                    "file": "/Users/hjchoi/Documents/dev/LocationCheckOut/library/build/intermediates/exploded-aar/com.android.support/recyclerview-v7/23.0.1/res/values/values.xml",
                     "position": {
                         "startLine": 5,
                         "startColumn": 4,
-                        "startOffset": 500,
+                        "startOffset": 551,
                         "endColumn": 74,
-                        "endOffset": 570
+                        "endOffset": 621
                     }
                 }
             },
@@ -30,13 +30,13 @@
                     "endOffset": 1259
                 },
                 "from": {
-                    "file": "/Users/hjchoi/Documents/dev/LocationCheckOut/library/build/intermediates/exploded-aar/com.android.support/recyclerview-v7/23.1.1/res/values/values.xml",
+                    "file": "/Users/hjchoi/Documents/dev/LocationCheckOut/library/build/intermediates/exploded-aar/com.android.support/recyclerview-v7/23.0.1/res/values/values.xml",
                     "position": {
                         "startLine": 8,
                         "startColumn": 4,
-                        "startOffset": 745,
+                        "startOffset": 847,
                         "endColumn": 65,
-                        "endOffset": 806
+                        "endOffset": 908
                     }
                 }
             }
