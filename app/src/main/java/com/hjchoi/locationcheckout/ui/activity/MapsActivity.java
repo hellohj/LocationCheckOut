@@ -13,7 +13,7 @@ public class MapsActivity extends FragmentActivity {
 
     private static final String TAG = "MapsActivity";
 
-    private BaseFragment _currentFragment;
+    private BaseFragment mCurrentFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,8 +30,8 @@ public class MapsActivity extends FragmentActivity {
     public void onBackPressed()
     {
         // intercept back press from details panel
-        _currentFragment = (MapsFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_maps);
-        if ((_currentFragment != null) && (_currentFragment.onBackPressed())) {
+        mCurrentFragment = (MapsFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_maps);
+        if ((mCurrentFragment != null) && (mCurrentFragment.onBackPressed())) {
             Log.d(TAG, "onBackPressed - from details to main map view");
             super.onBackPressed();
         } else {

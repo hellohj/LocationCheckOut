@@ -38,6 +38,7 @@ public class MapsFragment extends BaseFragment implements
         MapsView {
 
     private static final String TAG = "MapsFragment";
+    private static final int REQUEST_PLACE_PICKER = 1;
 
     @Bind(R.id.fab_checkOut)
     FloatingActionButton mFabCheckOut;
@@ -57,8 +58,6 @@ public class MapsFragment extends BaseFragment implements
     @Bind(R.id.tvPlaceAddress) TextView mTvPlaceAddress;
     @Bind(R.id.tvPlacePhone) TextView mTvPlacePhone;
     @Bind(R.id.tvPlaceWebsite) TextView mTvPlaceWebsite;
-    
-    private static final int REQUEST_PLACE_PICKER = 1;
 
     private MapsPresenter mPresenter;
 
@@ -87,17 +86,6 @@ public class MapsFragment extends BaseFragment implements
         return R.layout.fragment_maps;
     }
 
-    @Override
-    public boolean onBackPressed() {
-        if ((mLayout != null) && (mLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED)) {
-            Log.d(TAG, "onBackPressed here");
-            mLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-            return false;
-        }
-        Log.d(TAG, "onBackPressed before returning");
-        return true;
-    }
-
     public void onStart() {
         Log.d(TAG, "onStart");
         super.onStart();
@@ -110,6 +98,17 @@ public class MapsFragment extends BaseFragment implements
         mPresenter.connectGoogleApiClient(false);
         //mPresenter.onStop();
         super.onStop();
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        if ((mLayout != null) && (mLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED)) {
+            Log.d(TAG, "onBackPressed here");
+            mLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+            return false;
+        }
+        Log.d(TAG, "onBackPressed before returning");
+        return true;
     }
 
     /**
@@ -217,14 +216,6 @@ public class MapsFragment extends BaseFragment implements
         Utils.setDetailsOfPlace(model.getAddress(), mTvPlaceAddress, mIvPlaceAddress);
         Utils.setDetailsOfPlace(model.getPhone(), mTvPlacePhone, mIvPlacePhone);
         Utils.setDetailsOfPlace(model.getWebsite(), mTvPlaceWebsite, mIvPlaceWebsite);
-    }
-
-    @Override
-    public void hideDetailsLayout(boolean hide) {
-        if (mLayout != null) {
-            // when a device is rotated in detail page. go back to a default status
-            mDragLayout.setVisibility(View.INVISIBLE);
-        }
     }
 
     /////////////////////////
