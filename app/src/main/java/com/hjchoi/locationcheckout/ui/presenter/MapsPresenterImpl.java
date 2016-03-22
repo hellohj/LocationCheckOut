@@ -83,6 +83,7 @@ public class MapsPresenterImpl implements
     public void setSlidingUpPanel(Context context) {
         Log.d(TAG, "setUpSlidingUpPanel");
         mView.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+        mView.hideDetailsLayout(true);
         mView.setAddPanelSlideListener(this);
         mView.setFadeOnClickListener(this);
     }

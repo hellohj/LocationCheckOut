@@ -78,7 +78,7 @@ public class GoogleMapsInteractorImpl implements
 //                Location myLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
                 mMap.setMyLocationEnabled(true);
                 mMap.getUiSettings().setCompassEnabled(true);
-                mMap.getUiSettings().setZoomControlsEnabled(true);
+                mMap.getUiSettings().setZoomControlsEnabled(false);
                 mMap.getUiSettings().setMyLocationButtonEnabled(true);
             }
             Log.d(TAG, "onMapReady - ready to use after settings");

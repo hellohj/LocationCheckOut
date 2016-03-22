@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +43,8 @@ public class MapsFragment extends BaseFragment implements
     FloatingActionButton mFabCheckOut;
     @Bind(R.id.sliding_layout)
     SlidingUpPanelLayout mLayout;
+    @Bind(R.id.dragView)
+    LinearLayout mDragLayout;
     @Bind(R.id.tvName)
     TextView mLocationName;
     @Bind(R.id.map_cover)
@@ -71,6 +74,7 @@ public class MapsFragment extends BaseFragment implements
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        Log.d(TAG, "onActivityCreated");
         mPresenter = new MapsPresenterImpl(this);
         mPresenter.setGoogleMap(getContext(), getGoogleMapFragment());
         mPresenter.setFirebase(getContext());
@@ -213,6 +217,14 @@ public class MapsFragment extends BaseFragment implements
         Utils.setDetailsOfPlace(model.getAddress(), mTvPlaceAddress, mIvPlaceAddress);
         Utils.setDetailsOfPlace(model.getPhone(), mTvPlacePhone, mIvPlacePhone);
         Utils.setDetailsOfPlace(model.getWebsite(), mTvPlaceWebsite, mIvPlaceWebsite);
+    }
+
+    @Override
+    public void hideDetailsLayout(boolean hide) {
+        if (mLayout != null) {
+            // when a device is rotated in detail page. go back to a default status
+            mDragLayout.setVisibility(View.INVISIBLE);
+        }
     }
 
     /////////////////////////
