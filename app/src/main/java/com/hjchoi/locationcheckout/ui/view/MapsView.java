@@ -57,4 +57,9 @@ public interface MapsView {
      */
     void showDetailsOfPlace(MyPlace model);
 
+    /**
+     * Hide a details panel
+     * @param hide
+     */
+    void hideDetailsLayout(boolean hide);
 }
