@@ -27,4 +27,4 @@ Your places will be stored in Google Cloud via Firebase so you do not need to wo
 * Firebase (a platform offering real-time data storage, synchronization and so on): https://www.firebase.com/
 * Code refactoring according to MVP: https://github.com/antoniolg/androidmvp
 * (TODO) UI testing with Espresso
-* (TODO) Marshmallow permission
+* Marshmallow permission
